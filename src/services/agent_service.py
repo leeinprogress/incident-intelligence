@@ -220,7 +220,7 @@ Be thorough but concise. Focus on actionable insights."""
                 function_name = tool_call.function.name
                 function_args = json.loads(tool_call.function.arguments)
                 
-                logger.info(f"LLM requested tool: {function_name}", extra={"args": function_args})
+                logger.info(f"LLM requested tool: {function_name}", extra={"function_args": function_args})
                 
                 # Execute tool
                 tool_result = await self._execute_tool(function_name, function_args)
