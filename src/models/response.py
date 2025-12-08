@@ -19,6 +19,8 @@ class ToolExecution(BaseModel):
 
 
 class DiagnosisResponse(BaseModel):
+    """Response model for incident diagnosis"""
+    
     request_id: str = Field(..., description="Unique request identifier")
     status: str = Field(..., description="Diagnosis status (success, partial, failed)")
     query: str = Field(..., description="Original user query")
