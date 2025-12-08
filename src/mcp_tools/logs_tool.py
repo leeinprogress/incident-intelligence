@@ -1,3 +1,4 @@
+from google.cloud import logging as gcp_logging
 from datetime import datetime, timedelta, UTC
 from typing import Dict, Any
 import random
@@ -5,7 +6,9 @@ import random
 from src.mcp_tools.base import BaseTool
 from src.config import settings
 from src.utils.time_utils import parse_time_range
+from src.utils.logger import get_logger
 
+logger = get_logger(__name__)
 
 
 class LogsQueryTool(BaseTool):
@@ -18,6 +21,23 @@ class LogsQueryTool(BaseTool):
 
     def __init__(self):
         super().__init__(name="logs_query")
+
+        if not settings.use_mock_data and settings.google_cloud_project:
+            try:
+                self.gcp_client = gcp_logging.Client(project=settings.google_cloud_project)
+                self.gcp_client.setup_logging()
+                logger.info(f"GCP Logging client initialized for project: {settings.google_cloud_project}")
+            except Exception as e:
+                logger.error(f"Failed to initialize GCP Logging client: {e}")
+                logger.warning("Falling back to mock mode - will use mock data even if use_mock_data=False")
+                self.gcp_client = None
+        else:
+            self.gcp_client = None
+
+    
+    # ============================================================
+    # Public Interface
+    # ============================================================
 
     async def execute(
         self,
@@ -39,10 +59,81 @@ class LogsQueryTool(BaseTool):
             Dict containing log entries
         """
         
-        if settings.use_mock_data:
+        if settings.use_mock_data or not self.gcp_client:
+            # Use mock data if explicitly requested OR if GCP client failed to initialize
+            if not settings.use_mock_data and not self.gcp_client:
+                logger.warning("GCP client not available, using mock data instead")
             return self._generate_mock_logs(service_name, time_range, severity, limit)
         else:
-            raise NotImplementedError("Real GCP logging service will be implemented")
+            return self._query_gcp_logs(service_name, time_range, severity, limit)
+
+
+    # ============================================================
+    # GCP Data Source
+    # ============================================================
+
+    def _query_gcp_logs(self,
+        service_name: str,
+        time_range: str,
+        severity: str,
+        limit: int
+    ) -> Dict[str, Any]:
+        """
+        Query real GCP Cloud Logging
+        """
+        minutes = parse_time_range(time_range)
+        time_ago = datetime.now(UTC) - timedelta(minutes=minutes)
+        
+        filters = [
+            'resource.type="cloud_run_revision"', 
+            f'timestamp>="{time_ago.isoformat()}"'  
+        ]
+        
+        if service_name != "all":
+            filters.append(f'labels.service="{service_name}"')
+        
+        if severity != "all":
+            severity_map = {
+                "info": "INFO",
+                "warning": "WARNING",
+                "error": "ERROR",
+                "critical": "CRITICAL"
+            }
+            gcp_severity = severity_map.get(severity.lower(), "INFO")
+            filters.append(f'severity>="{gcp_severity}"')
+        
+        filter_str = " AND ".join(filters)
+
+
+        logs = []
+        try:
+            for entry in self.gcp_client.list_entries(
+                filter_=filter_str,
+                max_results=limit,
+                order_by=gcp_logging.DESCENDING  
+            ):
+                logs.append({
+                    "timestamp": entry.timestamp.isoformat() if entry.timestamp else datetime.now(UTC).isoformat(),
+                    "severity": entry.severity or "INFO",
+                    "service": service_name,
+                    "message": str(entry.payload) if entry.payload else "",
+                    "trace_id": entry.trace or "N/A"
+                })
+        
+        except Exception as e:
+            raise RuntimeError(f"Failed to query GCP logs: {str(e)}") from e
+        
+        return {
+            "total_logs": len(logs),
+            "time_range": time_range,
+            "service": service_name,
+            "logs": logs
+        }
+
+
+    # ============================================================
+    # Mock Data Source
+    # ============================================================
 
     def _generate_mock_logs(
         self,
@@ -53,7 +144,6 @@ class LogsQueryTool(BaseTool):
     ) -> Dict[str, Any]:
         """Generate realistic mock log data"""
 
-        # Parse time range
         minutes = parse_time_range(time_range)
 
         mock_logs = []
@@ -86,19 +176,18 @@ class LogsQueryTool(BaseTool):
             }
         ]
         
-        # filter by service and severity
+
         filtered_templates = [
             t for t in log_templates
             if (service_name == "all" or t["service"] == service_name)
             and (severity == "all" or t["severity"].lower() == severity.lower())
         ]
 
-        # generate log entries
+
         num_logs = min(random.randint(10, 50), limit)
         for i in range(num_logs):
             template = random.choice(filtered_templates) if filtered_templates else log_templates[0]
             
-            # timestamp from recent to past
             timestamp = datetime.now(UTC) - timedelta(
                 minutes=random.uniform(0, minutes)
             )

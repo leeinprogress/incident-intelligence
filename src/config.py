@@ -12,6 +12,9 @@ class Settings(BaseSettings):
 
     use_mock_data: bool = True
 
+    google_cloud_project: str = Field(default="", description="Google Cloud Project")
+    gcp_region: str = "asia-northeast3"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
