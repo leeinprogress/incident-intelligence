@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.git/
+tests/
+test_agent.py
+README.md
+.personal.txt
+.etc/

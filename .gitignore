@@ -10,6 +10,7 @@ ENV/
 # Environment
 .env
 .env.local
+.env.*.local
 
 # IDE
 .vscode/
@@ -25,3 +26,7 @@ htmlcov/
 
 # Docker
 *.log
+
+# Etc
+.personal.txt
+.etc
