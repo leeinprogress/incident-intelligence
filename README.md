@@ -1,8 +1,8 @@
 # Incident Intelligence
 
-> 🚀 **Live Demo**: [https://incident-intelligence-84343680734.asia-northeast3.run.app](https://incident-intelligence-84343680734.asia-northeast3.run.app)
+Incident diagnosis agent that analyzes production logs and metrics through natural language queries.
 
-AI-powered incident diagnosis agent that analyzes production logs and metrics through natural language queries.
+**Production API**: https://incident-intelligence-84343680734.asia-northeast3.run.app
 
 ```bash
 curl -X POST "https://incident-intelligence-84343680734.asia-northeast3.run.app/api/v1/diagnose" \
