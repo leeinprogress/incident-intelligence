@@ -1,87 +1,66 @@
 # Incident Intelligence
 
-> 🚧 **Status**: Early Development
+> 🚀 **Live Demo**: [https://incident-intelligence-84343680734.asia-northeast3.run.app](https://incident-intelligence-84343680734.asia-northeast3.run.app)
 
-AI agent that diagnoses production incidents by analyzing logs and metrics through natural language queries.
-
-**Example:**
-```python
-agent = DiagnosisAgent()
-result = await agent.diagnose("Why is the checkout service slow?")
-# → AI automatically queries logs + metrics and explains root cause
-```
-
-## How It Works
-
-1. Ask a question in natural language
-2. AI decides which tools to use (logs, metrics)
-3. Tools execute and gather data
-4. AI synthesizes findings into actionable diagnosis
-
-## Quick Start
-
-**Prerequisites:** Docker & Docker Compose (recommended) OR Python 3.11+
-> **Get API Key:** Sign up at [platform.openai.com](https://platform.openai.com) → API keys → Create new key
-
-### Option 1: Docker Compose (Recommended)
+AI-powered incident diagnosis agent that analyzes production logs and metrics through natural language queries.
 
 ```bash
-# 1. Set up environment variables
-cp env.example .env
-# Edit .env and add your OPENAI_API_KEY
-
-# 2. Run with Docker Compose
-docker compose up
-
-# Or run in background
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop
-docker compose down
+curl -X POST "https://incident-intelligence-84343680734.asia-northeast3.run.app/api/v1/diagnose" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Why is the checkout service slow?"}'
 ```
 
-### Option 2: Local Development
+## Architecture
 
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+**ReAct Pattern (Reasoning + Acting)**
+- Multi-turn conversation with OpenAI Function Calling
+- Autonomous tool orchestration with loop prevention
+- Self-correcting execution flow
 
-# 2. Set up environment
-cp env.example .env
-# Edit .env and add your OPENAI_API_KEY
+**Async/Await Design**
+- FastAPI async handlers for concurrent requests
+- Non-blocking tool execution
+- Sequential and parallel tool invocation support
 
-# 3. Run test
-python -m src.test_agent
-
-# 4. Run API server
-uvicorn src.main:app --reload
-```
+**Dual-Mode Operations**
+- Mock mode for testing and development
+- Real mode with GCP Cloud Logging & Monitoring
+- Automatic fallback with graceful error handling
 
 ## Tech Stack
 
-- **AI**: OpenAI GPT-4 (function calling)
+- **AI**: OpenAI GPT-4 (Function Calling)
 - **Framework**: FastAPI + Uvicorn
-- **Language**: Python 3.11+
-- **Container**: Docker + Docker Compose
-- **Data**: Mock data (GCP integration planned)
+- **Runtime**: Python 3.11+
+- **Infrastructure**: GCP Cloud Run
+- **Observability**: GCP Cloud Logging & Monitoring
+
+## Quick Start
+
+```bash
+# Clone and setup
+git clone <repository-url>
+cd incident-intelligence
+
+# Configure environment
+cp env.example .env
+# Add your OPENAI_API_KEY to .env
+
+# Run with Docker
+docker compose up
+
+# Or run locally
+pip install -r requirements.txt
+uvicorn src.main:app --reload
+```
+
+**API Documentation**: Visit `/docs` for interactive Swagger UI
 
 ## API Endpoints
 
-Once running, access the API at `http://localhost:8000`:
-
-- `GET /` - Health check
-- `POST /api/v1/diagnose` - Diagnose incidents
-- `GET /api/v1/tools` - List available tools
-- `GET /docs` - Interactive API documentation (Swagger UI)
-
-## Roadmap
-
-- [ ] GCP Cloud Logging & Monitoring integration
-- [ ] Cloud Run deployment
-- [ ] CI/CD pipeline (GitHub Actions)
+- `POST /api/v1/diagnose` - Diagnose incidents with AI
+- `GET /api/v1/tools` - List available diagnostic tools
+- `GET /health` - Service health check
 
 ## License
 
