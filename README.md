@@ -4,6 +4,8 @@ Incident diagnosis agent that analyzes production logs and metrics through natur
 
 **Production API**: https://incident-intelligence-84343680734.asia-northeast3.run.app
 
+**Swagger UI**: https://incident-intelligence-84343680734.asia-northeast3.run.app/docs
+
 ```bash
 curl -X POST "https://incident-intelligence-84343680734.asia-northeast3.run.app/api/v1/diagnose" \
   -H "Content-Type: application/json" \
@@ -11,6 +13,45 @@ curl -X POST "https://incident-intelligence-84343680734.asia-northeast3.run.app/
 ```
 
 ## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      FastAPI Server                      │
+│                    (Async/Await)                         │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────┐
+         │   DiagnosisAgent      │
+         │   (ReAct Pattern)     │
+         └───────────┬───────────┘
+                     │
+          ┌──────────┴──────────┐
+          │  OpenAI Function    │
+          │  Calling (GPT-4)    │
+          └──────────┬──────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
+┌───────────────┐         ┌──────────────┐
+│  Logs Tool    │         │ Metrics Tool │
+│  (Dual-Mode)  │         │ (Dual-Mode)  │
+└───────┬───────┘         └──────┬───────┘
+        │                        │
+        └────────┬───────────────┘
+                 │
+        ┌────────┴─────────┐
+        │                  │
+        ▼                  ▼
+┌──────────────┐   ┌─────────────┐
+│  Mock Data   │   │ GCP Cloud   │
+│              │   │ Logging &   │
+│              │   │ Monitoring  │
+└──────────────┘   └─────────────┘
+```
+
+## Technical Highlights
 
 **ReAct Pattern (Reasoning + Acting)**
 - Multi-turn conversation with OpenAI Function Calling
