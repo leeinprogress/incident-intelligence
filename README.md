@@ -71,6 +71,7 @@ curl -X POST "https://incident-intelligence-84343680734.asia-northeast3.run.app/
 ## Tech Stack
 
 - **AI**: OpenAI GPT-4 (Function Calling)
+- **MCP**: FastMCP (Model Context Protocol)
 - **Framework**: FastAPI + Uvicorn
 - **Runtime**: Python 3.11+
 - **Infrastructure**: GCP Cloud Run
@@ -102,6 +103,45 @@ uvicorn src.main:app --reload
 - `POST /api/v1/diagnose` - Diagnose incidents with AI
 - `GET /api/v1/tools` - List available diagnostic tools
 - `GET /health` - Service health check
+
+## MCP Server
+
+This project includes a standalone MCP (Model Context Protocol) server that exposes diagnostic tools.
+
+### Running the MCP Server
+
+```bash
+python -m src.mcp_server
+```
+
+### Available MCP Tools
+
+- **query_logs**: Query application logs with filtering by service, time range, and severity
+- **query_metrics**: Query system metrics (CPU, memory, latency, error rates)
+
+### MCP Resources
+
+- **config://settings**: Get current server configuration
+- **status://health**: Get server health status
+
+## Demo & Testing
+
+### Interactive Demos
+
+```bash
+# Demo the DiagnosisAgent with real scenarios
+python -m scripts.demo_agent
+
+# Demo MCP tools directly
+python -m scripts.demo_mcp_server
+```
+
+### Unit Tests
+
+```bash
+# Run pytest test suite
+pytest tests/
+```
 
 ## License
 

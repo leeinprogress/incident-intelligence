@@ -1,7 +1,7 @@
 """
-Test script for DiagnosisAgent
+Demo script for DiagnosisAgent
 
-Run this to verify the agent works correctly.
+Run this to see the agent in action with real incident diagnosis scenarios.
 """
 
 import asyncio
@@ -85,7 +85,7 @@ async def test_general_query():
 
 async def main():
     """Run all tests"""
-    print("\n" + "🧪 Testing DiagnosisAgent ".center(60, "="))
+    print("\n" + "🧪 DiagnosisAgent Demo ".center(60, "="))
     print()
     
     # Setup logging
@@ -97,13 +97,14 @@ async def main():
         await test_specific_service()
         await test_general_query()
         
-        print("\n✅ All tests completed successfully!")
+        print("\n✅ All demos completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Test failed: {str(e)}")
+        print(f"\n❌ Demo failed: {str(e)}")
         import traceback
         traceback.print_exc()
 
 
 if __name__ == "__main__":
     asyncio.run(main())
+
