@@ -7,6 +7,7 @@ from datetime import datetime, UTC
 
 from src.utils.logger import setup_logging, get_logger
 from src.services.agent_service import DiagnosisAgent
+from src.services.langchain_agent_service import LangChainDiagnosisAgent
 from src.models.request import IncidentQuery
 from src.models.response import DiagnosisResponse
 
@@ -25,7 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-agent = DiagnosisAgent()
+# Initialize both agents for comparison
+agent = DiagnosisAgent()  # OpenAI direct
+langchain_agent = LangChainDiagnosisAgent()  # LangChain framework
 
 
 @app.get("/")
@@ -34,8 +37,13 @@ def health_check():
 
 @app.post("/api/v1/diagnose", response_model=DiagnosisResponse)
 async def diagnose(query: IncidentQuery):
+    """
+    Diagnose incidents using OpenAI Function Calling (direct API)
+    
+    This endpoint uses the original implementation with direct OpenAI API calls.
+    """
     try: 
-        logger.info(f"Diagnosis request received", extra={"query": query.query})
+        logger.info(f"Diagnosis request received (OpenAI)", extra={"query": query.query})
         result = await agent.diagnose(
             query = query.query,
             service_name = query.service_name,
@@ -45,6 +53,30 @@ async def diagnose(query: IncidentQuery):
     except Exception as e:
         logger.error(f"Error diagnosing incident: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/diagnose-langchain", response_model=DiagnosisResponse)
+async def diagnose_langchain(query: IncidentQuery):
+    """
+    Diagnose incidents using LangChain framework
+    
+    This endpoint uses LangChain's ChatOpenAI and StructuredTools for the same diagnosis logic.
+    Allows for direct comparison with the OpenAI direct implementation.
+    
+    Response includes 'framework': 'langchain' field for identification.
+    """
+    try:
+        logger.info(f"Diagnosis request received (LangChain)", extra={"query": query.query})
+        result = await langchain_agent.diagnose(
+            query=query.query,
+            service_name=query.service_name,
+            time_range=query.time_range
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error diagnosing incident (LangChain): {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/api/v1/tools")
 def get_tools():
