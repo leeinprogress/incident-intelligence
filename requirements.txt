@@ -4,9 +4,11 @@ uvicorn[standard]==0.27.0
 pydantic>=2.5.3
 pydantic-settings>=2.6.1
 
-# MCP & AI
-fastmcp==0.2.0
+# AI & LLM
 openai>=1.10.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-core>=0.1.0
 
 # Data & Utils
 python-dotenv==1.0.0
