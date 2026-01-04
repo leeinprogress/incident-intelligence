@@ -4,7 +4,8 @@ import uuid
 import json
 from openai import AsyncOpenAI
 from src.config import settings
-from src.mcp_tools import LogsQueryTool, MetricsQueryTool
+from src.observability_tools.logs_tool import LogsQueryTool
+from src.observability_tools.metrics_tool import MetricsQueryTool
 from src.utils.logger import get_logger
 
 
@@ -14,7 +15,7 @@ logger = get_logger(__name__)
 
 class DiagnosisAgent:
     """
-    AI Agent that diagnoses incidents using MCP tools
+    AI Agent that diagnoses incidents using custom observability tools
     
     The agent uses OpenAI's function calling to:
     1. Analyze user queries about incidents
@@ -28,7 +29,7 @@ class DiagnosisAgent:
         # OpenAI client
         self.client = AsyncOpenAI(api_key=settings.openai_api_key)
 
-        # MCP tools
+        # Custom tools
         self.logs_tool = LogsQueryTool()
         self.metrics_tool = MetricsQueryTool()
 
@@ -45,9 +46,9 @@ class DiagnosisAgent:
 
     def _build_function_schemas(self) -> List[Dict[str, Any]]:
         """
-        Build OpenAI function schemas from MCP tools
+        Build OpenAI function schemas from custom tools
         
-        This converts our MCP tools into a format that OpenAI understands.
+        This converts our custom tools into a format that OpenAI understands.
         LLM will use these schemas to decide when and how to call tools.
         """
         return [
@@ -152,7 +153,7 @@ class DiagnosisAgent:
         time_range: str = "15m"
     ) -> Dict[str, Any]:
         """
-        Diagnose an incident using LLM and MCP tools
+        Diagnose an incident using LLM and custom tools
         
         Args:
             query: User's question about the incident

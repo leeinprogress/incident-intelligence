@@ -1,4 +1,4 @@
-"""Time range utilities for MCP tools"""
+"""Time range utilities for observability tools"""
 
 from typing import Dict
 

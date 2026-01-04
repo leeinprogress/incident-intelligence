@@ -1,8 +1,8 @@
 import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
-from src.mcp_tools.logs_tool import LogsQueryTool
-from src.mcp_tools.metrics_tool import MetricsQueryTool
+from src.observability_tools.logs_tool import LogsQueryTool
+from src.observability_tools.metrics_tool import MetricsQueryTool
 
 
 class TestMetricsQueryTool:

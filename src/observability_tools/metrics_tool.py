@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, UTC
 from typing import Dict, Any, List
 import random
 
-from src.mcp_tools.base import BaseTool
+from src.observability_tools.base import BaseTool
 from src.config import settings
 from src.utils.time_utils import parse_time_range
 from src.utils.logger import get_logger

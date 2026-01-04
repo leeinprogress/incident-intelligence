@@ -1,7 +1,7 @@
 """
 LangChain Tool Wrappers
 
-This module wraps existing MCP tools (LogsQueryTool, MetricsQueryTool) 
+This module wraps custom observability tools (LogsQueryTool, MetricsQueryTool) 
 as LangChain StructuredTools for use with LangChain agents.
 
 Key Features:
@@ -14,7 +14,8 @@ from typing import Dict, Any
 from pydantic import BaseModel, Field
 from langchain_core.tools import StructuredTool
 
-from src.mcp_tools import LogsQueryTool, MetricsQueryTool
+from src.observability_tools.logs_tool import LogsQueryTool
+from src.observability_tools.metrics_tool import MetricsQueryTool
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)

@@ -1,6 +1,6 @@
 # Incident Intelligence
 
-Incident diagnosis system that analyzes production logs and metrics through natural language queries using **LangChain** and **OpenAI Function Calling**.
+AI-powered incident diagnosis system that analyzes production logs and metrics through natural language queries using **LangChain** and **OpenAI Function Calling**.
 
 **Production API**: https://incident-intelligence-84343680734.asia-northeast3.run.app
 
